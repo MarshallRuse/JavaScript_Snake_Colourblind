@@ -1,9 +1,14 @@
+body {
+	background-color: #7A904C;
+}
+
 #scoreTable {
 	width: 40%;
 	float: right;
 }
 
 #scoreTable th {
+	color: #C3A575;
 	font-weight: bold;
 	font-size: 32px;
 }

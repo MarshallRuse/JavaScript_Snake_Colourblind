@@ -167,7 +167,7 @@ const Display = (() => {
 
 	let scoreBoard = document.querySelector("#scoreBoard");
 	let bg = new Image();
-	bg.src = "./images/background.jpg";
+	bg.src = "./images/background_colourblind.jpg";
 
 	const drawBoardBackground = () => {
 		ctx.rect(unit, unit, 19*unit, 19*unit);
@@ -216,7 +216,7 @@ const Display = (() => {
 						ctx.fillRect((x + 1)*unit, (y+3)*unit, ((x+1)*unit)+unit, ((y+3)*unit)+unit);
 					}
 					else { //bottom border
-						ctx.fillStyle = "#4A8E00";
+						ctx.fillStyle = "#7A904C";
 						ctx.fillRect((x + 1)*unit, (y+3)*unit, ((x+1)*unit)+unit, ((y+3)*unit)+unit);
 				}
 				
@@ -224,7 +224,7 @@ const Display = (() => {
 				
 			}
 		//right wall of board
-		ctx.fillStyle = "#4A8E00";
+		ctx.fillStyle = "#7A904C";
 		for (let y = 0; y < boardMap[0].length; y++){
 			ctx.fillRect((boardMap.length + 1)*unit, ((y+2)*unit)+unit, ((boardMap[0].length + 3)*unit)+unit, ((y+3)*unit)+unit);
 		}
@@ -246,7 +246,6 @@ const Display = (() => {
 		if (boardSwitchCount % 5 == 0){
 			boardMap = [];
 			generateColours();
-			console.log(boardMap);
 			boardSwitchCount = 1;
 		}
 		boardSwitchCount++;
@@ -254,10 +253,35 @@ const Display = (() => {
 
 		//the snake
 		for (let i = 0; i < Snake.body.length; i++){
-			ctx.lineWidth = 2;
-			ctx.strokeStyle = "black";
+			ctx.lineWidth = 3;
+			if (i % 2 == 0 && boardSwitchCount % 10 < 5){
+				ctx.strokeStyle = "rgb(207,149,122)";
+			}
+			else if (i % 2 == 0 && boardSwitchCount % 10 > 5){
+				ctx.strokeStyle = "rgb(197,201,116)";
+			}
+			else if (i % 2 == 1 && boardSwitchCount % 10 < 5){
+				ctx.strokeStyle = "rgb(197,201,116)";
+			}
+			else{
+				ctx.strokeStyle = "rgb(207,149,122)";
+			}
+			
 			ctx.strokeRect((Snake.body[i].x - 1), (Snake.body[i].y - 1), (unit + 1), (unit + 1));
-			ctx.fillStyle = "white";
+			
+			if (i % 2 == 0 && boardSwitchCount % 10 < 5){
+				ctx.fillStyle = "rgb(197,201,116)";
+			}
+			else if (i % 2 == 0 && boardSwitchCount % 10 > 5){
+				ctx.fillStyle = "rgb(207,149,122)";
+			}
+			else if (i % 2 == 1 && boardSwitchCount % 10 < 5){
+				ctx.fillStyle = "rgb(207,149,122)";
+			}
+			else{
+				ctx.fillStyle = "rgb(197,201,116)";
+			}
+			
 			ctx.fillRect(Snake.body[i].x, Snake.body[i].y, unit, unit);
 		}
 		
@@ -265,7 +289,7 @@ const Display = (() => {
 		ctx.fillStyle = foodItem.style;
 		ctx.fillRect(foodItem.x_loc, foodItem.y_loc, unit, unit);
 
-		ctx.fillStyle = "white";
+		ctx.fillStyle = "#C3A575";
 		ctx.font = "48px serif";
 		let theScore = GamePlay.getScore();
 		ctx.fillText("Score: " + theScore, unit, 2*unit);
@@ -286,7 +310,9 @@ const Display = (() => {
 		let b = Math.floor(Math.random() * 255);
 
 		let row = document.createElement("TR");
-		row.style.color = "rgb(" + r + "," + g + "," + b + ")";
+		let c = Math.floor(Math.random() * redColors.length);
+
+		row.style.color = "rgb(" + redColors[c].r + "," + redColors[c].g + "," + redColors[c].b + ")";
 		let name = row.insertCell(0);
 		name.innerHTML = uiElements.getPlayerName();
 		let score = row.insertCell(1);
