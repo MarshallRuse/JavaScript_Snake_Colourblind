@@ -40,7 +40,7 @@ const Snake = (() => {
 
 	const moveRight = () => {
 		x = body[0].x + unit;
-		console.log("x is: " + x);
+		//console.log("x is: " + x);
 		body.unshift({x, y});
 		if (collision()){
 			dies();
@@ -162,9 +162,8 @@ const Display = (() => {
 	{r:192, g:104, b:89}, {r:207, g:149, b:122}, {r:240, g:186, b:128}, {r:214, g:169, b:137},
 	{r:193, g:135, b:93}];
 
-
-	// remember to add a counter to slow down the flipping of colors, something like
-	// only change the board if colorCounter % 100 == 0 
+	let boardMap = []; //empty array, to be 2D
+	
 
 	let scoreBoard = document.querySelector("#scoreBoard");
 	let bg = new Image();
@@ -186,6 +185,53 @@ const Display = (() => {
 		}
 	}
 	
+	const generateColours = () => {
+		let xIndex = 0;
+			for (let x = unit; x < 19*unit; x += unit){
+				boardMap[xIndex] = []; // new x row to be filled with y's
+				for (let y = 3*unit; y < 19*unit; y += unit){
+					if (redChoice()){
+						let redIndex = Math.floor(Math.random() * redColors.length);
+						let squareColour = "rgb(" + redColors[redIndex].r + ", " + redColors[redIndex].g +
+						", " + redColors[redIndex].b + ")";
+						boardMap[xIndex].push(squareColour);
+					}
+					else{
+						let greenIndex = Math.floor(Math.random() * greenColors.length);
+						let squareColour = "rgb(" + greenColors[greenIndex].r + ", " + greenColors[greenIndex].g +
+						", " + greenColors[greenIndex].b + ")";
+						boardMap[xIndex].push(squareColour);
+					}
+					ctx.fillRect(x, y, x+unit, y+unit);
+				}
+				xIndex++;
+			}
+	}
+
+	const makeBoard = () => {
+		for (let x = 0; x < boardMap.length; x++){
+				for (let y = 0; y <= boardMap[x].length; y++){
+					if (y < boardMap[x].length){
+						ctx.fillStyle = boardMap[x][y];
+						ctx.fillRect((x + 1)*unit, (y+3)*unit, ((x+1)*unit)+unit, ((y+3)*unit)+unit);
+					}
+					else { //bottom border
+						ctx.fillStyle = "#4A8E00";
+						ctx.fillRect((x + 1)*unit, (y+3)*unit, ((x+1)*unit)+unit, ((y+3)*unit)+unit);
+				}
+				
+				}
+				
+			}
+		//right wall of board
+		ctx.fillStyle = "#4A8E00";
+		for (let y = 0; y < boardMap[0].length; y++){
+			ctx.fillRect((boardMap.length + 1)*unit, ((y+2)*unit)+unit, ((boardMap[0].length + 3)*unit)+unit, ((y+3)*unit)+unit);
+		}
+		
+		
+	}
+
 	const draw = () => {
 
 		let food = GameBoard.getFood();
@@ -195,26 +241,16 @@ const Display = (() => {
 			y_loc: food.y,
 		};
 
+		drawBoardBackground();
 		// the dynamic game board
-		if (boardSwitchCount % 25 == 0){
-			for (let x = unit; x < 19*unit; x += unit){
-				for (let y = 3*unit; y < 19*unit; y += unit){
-					if (redChoice()){
-						let redIndex = Math.floor(Math.random() * redColors.length);
-						ctx.fillStyle = "rgb(" + redColors[redIndex].r + ", " + redColors[redIndex].g +
-						", " + redColors[redIndex].b + ")";
-					}
-					else{
-						let greenIndex = Math.floor(Math.random() * greenColors.length);
-						ctx.fillStyle = "rgb(" + greenColors[greenIndex].r + ", " + greenColors[greenIndex].g +
-						", " + greenColors[greenIndex].b + ")";
-					}
-					ctx.fillRect(x, y, x+unit, y+unit);
-				}
-			}
+		if (boardSwitchCount % 5 == 0){
+			boardMap = [];
+			generateColours();
+			console.log(boardMap);
 			boardSwitchCount = 1;
 		}
 		boardSwitchCount++;
+		makeBoard();
 
 		//the snake
 		for (let i = 0; i < Snake.body.length; i++){
@@ -275,7 +311,6 @@ const GamePlay = (() => {
 			Snake.moveUp();
 		}
 		else if (Snake.dir == "r" && (Snake.body[0].x) <= GameBoard.RIGHT_WALL){
-			console.log("Snake x is: " + Snake.body[0].x);
 			Snake.moveRight();
 		}
 		else if (Snake.dir == "d" && Snake.body[0].y <= GameBoard.BOTTOM_WALL){
